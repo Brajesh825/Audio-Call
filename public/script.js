@@ -37,7 +37,7 @@ peer.on('open', (id) => {
 peer.on('error', (err) => {
     console.error('PeerJS Error:', err);
     alert('An error occurred while connecting to the server.');
-  });
+});
 
 
 // Start a call

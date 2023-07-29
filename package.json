@@ -4,6 +4,7 @@
     "peer": "^1.0.0"
   },
   "scripts": {
-    "start" : "node index.js"
+    "start-audio": "node audio.js",
+    "start-client" : "node client.js"
   }
 }
