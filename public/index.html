@@ -1,0 +1,23 @@
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>One-on-One Calling App</title>
+</head>
+<body>
+  <h1>One-on-One Calling App</h1>
+  <div>
+    <input type="text" id="username" placeholder="Enter your username">
+    <button id="createId">Create ID</button>
+  </div>
+  <div>
+    <input type="text" id="destinationId" placeholder="Enter destination user ID">
+    <button id="startCall" disabled>Start Call</button>
+    <button id="endCall" disabled>End Call</button>
+  </div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/peerjs/1.4.7/peerjs.min.js" integrity="sha512-y23HV23IWVEWlGpIez8Kvr87ZT16V9gICf5dfqu5rjxs7ip66pcIf87/uFbxn9tStGCgohZeIktIAHg9fjubsw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="script.js"></script>
+</body>
+</html>
