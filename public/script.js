@@ -25,7 +25,7 @@ userIdElement.innerText = userId
 
 // Connect to the Peer server
 peer = new Peer(userId, {
-    host: '/',
+    host: window.location.hostname,
     port: 9000,
     path: '/peerjs',
 });
@@ -33,6 +33,12 @@ peer = new Peer(userId, {
 peer.on('open', (id) => {
     console.log('Connected with ID:', id);
 });
+
+peer.on('error', (err) => {
+    console.error('PeerJS Error:', err);
+    alert('An error occurred while connecting to the server.');
+  });
+
 
 // Start a call
 function startCall() {
@@ -49,6 +55,9 @@ function startCall() {
                 callerUserName: userName,
                 callerType: "audio"
             }
+
+
+
 
             connection = peer.call(remoteUserId, stream, { metadata });
             connection.on('stream', (remoteStream) => {
