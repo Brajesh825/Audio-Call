@@ -5,6 +5,7 @@
     "peer": "^1.0.0"
   },
   "scripts": {
+    "build" : "npm i",
     "start": "node server.js"
   }
 }
