@@ -1,11 +1,10 @@
 // server.js
 const express = require('express');
 const app = express();
-const http = require('http')
-const server = http.createServer()
+const http = require('http').createServer(app);
 const { ExpressPeerServer } = require('peer');
 
-const peerServer = ExpressPeerServer(server, {
+const peerServer = ExpressPeerServer(http, {
   debug: true,
 });
 
