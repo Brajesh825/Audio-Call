@@ -26,7 +26,7 @@ userIdElement.innerText = userId
 // Connect to the Peer server
 const wsConfig = {
     host: "audiocall.onrender.com",
-    port: 4000,
+    port: 9000,
     path: "/peerjs"
 }
 
@@ -37,7 +37,7 @@ const localConfig = {
 }
 
 
-peer = new Peer(userId, wsConfig);
+peer = new Peer(userId, localConfig);
 
 peer.on('open', (id) => {
     console.log('Connected with ID:', id);

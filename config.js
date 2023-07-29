@@ -1,6 +1,6 @@
 const config = {
     audioServer: {
-        port: 4000,
+        port: 9000,
         path: "/peerjs",
         allow_discovery: false,
     },
