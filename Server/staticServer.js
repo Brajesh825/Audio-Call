@@ -7,7 +7,7 @@ class StaticServer {
         this.config = config
     }
     start() {
-        app.use(express.static(path.join(__dirname, 'public')));
+        app.use(express.static(path.join(__dirname,"../" , 'public')));
         // Start the server
         app.listen(this.config.port, () => {
             console.log(`Static server running on http://localhost:${this.config.port}`);
