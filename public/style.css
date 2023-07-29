@@ -1,0 +1,21 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+  }
+  
+  h1 {
+    margin-top: 20px;
+  }
+  
+  video, audio {
+    width: 300px;
+    height: 200px;
+    margin: 10px;
+  }
+  
+  button {
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px;
+  }
+  

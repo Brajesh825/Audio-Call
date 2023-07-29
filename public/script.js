@@ -1,133 +1,105 @@
-// public/script.js
-let peer = null;
-let call = null;
-let myId = null;
-let myUsername = '';
+const localAudio = document.getElementById('localAudio');
+const remoteAudio = document.getElementById('remoteAudio');
+const startCallBtn = document.getElementById('startCall');
+const endCallBtn = document.getElementById('endCall');
+const userIdElement = document.getElementById('userId');
+const userNameElement = document.getElementById('userName')
 
-const usernameInput = document.getElementById('username');
-const createIdButton = document.getElementById('createId');
-const destinationIdInput = document.getElementById('destinationId');
-const startCallButton = document.getElementById('startCall');
-const endCallButton = document.getElementById('endCall');
+let userName;
+userNameElement.onchange = (e) => {
+    userName = e.target.value
+}
 
-createIdButton.addEventListener('click', () => {
-  const username = usernameInput.value.trim();
+let peer, localStream, remoteStream, connection;
 
-  if (!username) {
-    alert('Please enter your username.');
-    return;
-  }
+// Function to generate a random ID for the user
+function generateUserId() {
+    const id = Math.random().toString(36).slice(2);
+    userIdElement.innerText = id; // Update the element with the generated ID
+    return id;
+}
 
-  // Generate a random unique ID for the client
-  myId = generateRandomId();
-  myUsername = username;
+// Generate a random ID for the user
+const userId = generateUserId();
+userIdElement.innerText = userId
 
-  // Display the unique ID on the page
-  alert(`Your unique ID: ${myId}`);
-
-  // Enable/disable buttons
-  createIdButton.disabled = true;
-  startCallButton.disabled = false;
-
-  peer = new Peer(myId, {
+// Connect to the Peer server
+peer = new Peer(userId, {
     host: '/',
-    port: 3000,
+    port: 9000,
     path: '/peerjs',
-    debug: 3,
-  });
+});
 
-  // Handle Incoming Call
+peer.on('open', (id) => {
+    console.log('Connected with ID:', id);
+});
 
-  peer.on('call', incomingCall => {
-    console.log("Incoming Call");
+// Start a call
+function startCall() {
     navigator.mediaDevices.getUserMedia({ audio: true })
-      .then(stream => {
-        // Answer the incoming call and send our audio stream
-        incomingCall.answer(stream);
-        setupCallEventHandlers(incomingCall);
-      })
-      .catch(error => console.error('Error accessing user media:', error));
+        .then((stream) => {
+            localAudio.srcObject = stream;
+            localStream = stream;
 
-    // Enable/disable buttons
-    startCallButton.disabled = true;
-    endCallButton.disabled = false;
-  });
+            // Call a peer with a given ID
+            const remoteUserId = prompt('Enter the ID of the person you want to call:');
+            if (!remoteUserId) return;
 
-});
+            const metadata = {
+                callerUserName: userName,
+                callerType: "audio"
+            }
 
-startCallButton.addEventListener('click', () => {
-  const destinationId = destinationIdInput.value.trim();
-
-  if (!destinationId) {
-    alert('Please enter the destination user ID.');
-    return;
-  }
-
-  // Initialize Peer.js with the generated unique ID
-  
-
-  // Get user media and start the call
-  navigator.mediaDevices.getUserMedia({ audio: true })
-    .then(stream => {
-      call = peer.call(destinationId, stream);
-      setupCallEventHandlers(call);
-    })
-    .catch(error => console.error('Error accessing user media:', error));
-
-  // Enable/disable buttons
-  startCallButton.disabled = true;
-  endCallButton.disabled = false;
-});
-
-endCallButton.addEventListener('click', () => {
-  if (call) {
-    call.close();
-    call = null;
-  }
-  if (peer) {
-    peer.disconnect();
-    peer.destroy();
-    peer = null;
-  }
-
-  // Enable/disable buttons
-  startCallButton.disabled = false;
-  endCallButton.disabled = true;
-});
-
-function generateRandomId() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  let randomId = '';
-  for (let i = 0; i < 8; i++) {
-    randomId += chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-  return randomId;
+            connection = peer.call(remoteUserId, stream, { metadata });
+            connection.on('stream', (remoteStream) => {
+                remoteAudio.srcObject = remoteStream;
+            });
+        })
+        .catch((error) => {
+            console.error('Error accessing media devices:', error);
+        });
 }
 
-function setupCallEventHandlers(callInstance) {
-  call = callInstance;
-  call.on('stream', remoteStream => {
-    // Handle the remote audio stream
-    const audioElement = document.createElement('audio');
-    audioElement.srcObject = remoteStream;
-    audioElement.play();
-    document.body.appendChild(audioElement);
-  });
-
-  call.on('close', () => {
-    // Call ended, clean up resources
-    if (call) {
-      call.close();
-      call = null;
+// End the call
+function endCall() {
+    if (connection) {
+        connection.close();
     }
-    if (peer) {
-      peer.disconnect();
-      peer.destroy();
-      peer = null;
+    if (localStream) {
+        localStream.getTracks().forEach((track) => track.stop());
     }
-
-    // Enable/disable buttons
-    startCallButton.disabled = false;
-    endCallButton.disabled = true;
-  });
+    remoteAudio.srcObject = null;
 }
+
+// Start call when the "Start Call" button is clicked
+startCallBtn.addEventListener('click', () => {
+    startCall();
+});
+
+// End call when the "End Call" button is clicked
+endCallBtn.addEventListener('click', () => {
+    endCall();
+});
+
+// Listen for incoming calls
+peer.on('call', (call) => {
+    console.log("Incoming Call");
+    let peer = call.peer
+    let callerName = call.metadata.callerUserName
+    let answer = confirm("Incoming Call From " + callerName)
+    if (answer) {
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then((stream) => {
+                localAudio.srcObject = stream;
+                localStream = stream;
+
+                call.answer(stream);
+                call.on('stream', (remoteStream) => {
+                    remoteAudio.srcObject = remoteStream;
+                });
+            })
+            .catch((error) => {
+                console.error('Error accessing media devices:', error);
+            });
+    }
+});
