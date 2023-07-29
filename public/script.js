@@ -36,6 +36,23 @@ createIdButton.addEventListener('click', () => {
     debug: 3,
   });
 
+  // Handle Incoming Call
+
+  peer.on('call', incomingCall => {
+    console.log("Incoming Call");
+    navigator.mediaDevices.getUserMedia({ audio: true })
+      .then(stream => {
+        // Answer the incoming call and send our audio stream
+        incomingCall.answer(stream);
+        setupCallEventHandlers(incomingCall);
+      })
+      .catch(error => console.error('Error accessing user media:', error));
+
+    // Enable/disable buttons
+    startCallButton.disabled = true;
+    endCallButton.disabled = false;
+  });
+
 });
 
 startCallButton.addEventListener('click', () => {
